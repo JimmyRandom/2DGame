@@ -80,14 +80,6 @@ void WindowInit :: Close () {
 
 
 
-int main (int argc, char **args){
-    WindowInit prozor (480, 600);
-    prozor.LoadImageBMP("stretch.bmp");
-    prozor.BlitImage();
-    SDL_Delay (5000);
-    prozor.Close();
-    return 0;
-}
 
 
 
