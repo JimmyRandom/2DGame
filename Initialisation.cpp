@@ -7,7 +7,7 @@ class WindowInit {
     public:
         WindowInit (int height, int width);
         ~WindowInit ();
-        void LoadImageBMP (std :: string path);
+        void LoadImage (std :: string path);
         void Close ();
         void BlitImage ();
         SDL_Rect stretchRect;
@@ -42,21 +42,26 @@ void WindowInit :: Init () {
             printf("Error creating window : %s", SDL_GetError());
         }
         else {
-            windowSurface = SDL_GetWindowSurface (window);
-            stretchRect.x = 0;
-            stretchRect.y = 0;
-            stretchRect.w = windowWidth;
-            stretchRect.h = windowHeight;
+            if (!IMG_Init (IMG_INIT_PNG) ){
+                printf ("Error initialising PNG : %s", IMG_GetError());
+            }
+            else {
+                windowSurface = SDL_GetWindowSurface (window);
+                stretchRect.x = 0;
+                stretchRect.y = 0;
+                stretchRect.w = windowWidth;
+                stretchRect.h = windowHeight;
+            }
         }
     }
 }
 
-void WindowInit :: LoadImageBMP (std :: string path) {
+void WindowInit :: LoadImage (std :: string path) {
     SDL_Surface *surface = NULL;
 
-    surface = SDL_LoadBMP (path.c_str());
+    surface = IMG_Load (path.c_str());
     if (surface == NULL) {
-        printf ("Error loading BMP : %s", SDL_GetError());
+        printf ("Error loading image : %s", IMG_GetError());
     }
     else {
         loadedSurface = SDL_ConvertSurface (surface, windowSurface -> format, NULL);
@@ -75,19 +80,11 @@ void WindowInit :: BlitImage () {
 void WindowInit :: Close () {
     SDL_FreeSurface (windowSurface);
     SDL_DestroyWindow (window);
+    IMG_Quit();
     SDL_Quit();
 }
 
 
-
-int main (int argc, char **args){
-    WindowInit prozor (480, 600);
-    prozor.LoadImageBMP("stretch.bmp");
-    prozor.BlitImage();
-    SDL_Delay (5000);
-    prozor.Close();
-    return 0;
-}
 
 
 
