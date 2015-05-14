@@ -22,6 +22,7 @@ using namespace std;
 
 class WindowInit {
     public:
+
         WindowInit (int width, int height);
         ~WindowInit ();
 
@@ -31,12 +32,11 @@ class WindowInit {
         void LoadTexture (std :: string path);
         void RenderTexture ();
 
-        SDL_Rect stretchRect;
+        SDL_Rect imageProperties;
+        SDL_Rect windowProperties;
 
     protected:
 
-        int windowHeight;
-        int windowWidth;
         SDL_Window *window = NULL;
         SDL_Surface *loadedSurface = NULL;
 
@@ -55,26 +55,42 @@ class WindowInit {
         void CloseTexture ();
         void TextureInit ();
 
-        int setClose;
+        int setCloseImage;
+        int setCloseTexture;
 };
 
 WindowInit :: WindowInit (int width, int height) {
-    windowHeight = height;
-    windowWidth = width;
+    windowProperties.h = height;
+    windowProperties.w = width;
+    imageProperties.w = width;
+    imageProperties.h = height;
     Init();
 }
 
 WindowInit :: ~WindowInit (){
-    if (setClose == 0) CloseImage();
-    else CloseTexture ();
+    if (setCloseImage == 1) CloseImage();
+    if  (setCloseTexture == 1) CloseTexture ();
+
+
+    SDL_DestroyWindow (window);
+    window = NULL;
+
+    IMG_Quit ();
+    SDL_Quit ();
 }
 
 void WindowInit :: Init () {
+    imageProperties.x = 0;
+    imageProperties.y = 0;
+
+    windowProperties.x = 0;
+    windowProperties.y = 0;
+
     if (SDL_Init (SDL_INIT_VIDEO) < 0) {
         printf ("Error in SDL_Init : %s", SDL_GetError());
     }
     else {
-        window = SDL_CreateWindow ("2DGame", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_SHOWN );
+        window = SDL_CreateWindow ("2DGame", windowProperties.x, windowProperties.y, windowProperties.w, windowProperties.h, SDL_WINDOW_SHOWN );
         if (window == NULL) {
             printf("Error creating window : %s", SDL_GetError());
         }
@@ -82,18 +98,13 @@ void WindowInit :: Init () {
             if (!IMG_Init (IMG_INIT_PNG) ){
                 printf ("Error initialising PNG : %s", IMG_GetError());
             }
-            else {
-                stretchRect.x = 0;
-                stretchRect.y = 0;
-                stretchRect.w = windowWidth;
-                stretchRect.h = windowHeight;
-            }
         }
     }
 }
 
 void WindowInit :: ImageInit () {
     windowSurface = SDL_GetWindowSurface (window);
+    setCloseImage = 1;
 }
 
 void WindowInit :: TextureInit () {
@@ -107,6 +118,7 @@ void WindowInit :: TextureInit () {
         }
         else {
             SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
+            setCloseTexture = 1;
         }
     }
 }
@@ -130,7 +142,7 @@ void WindowInit :: LoadImage (std :: string path) {
 }
 
 void WindowInit :: BlitImage () {
-    SDL_BlitScaled (loadedSurface, NULL, windowSurface, &stretchRect);
+    SDL_BlitScaled (loadedSurface, NULL, windowSurface, &imageProperties);
     SDL_UpdateWindowSurface (window);
 }
 
@@ -165,11 +177,6 @@ void WindowInit :: CloseImage () {
 
     SDL_FreeSurface (windowSurface);
     windowSurface = NULL;
-    SDL_DestroyWindow (window);
-    window = NULL;
-
-    IMG_Quit ();
-    SDL_Quit ();
 }
 
 void WindowInit :: CloseTexture () {
@@ -178,12 +185,6 @@ void WindowInit :: CloseTexture () {
     texture = NULL;
     SDL_DestroyRenderer (renderer);
     renderer = NULL;
-
-    SDL_DestroyWindow (window);
-    window = NULL;
-
-    IMG_Quit ();
-    SDL_Quit ();
 }
 
 
