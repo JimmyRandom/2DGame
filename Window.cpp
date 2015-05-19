@@ -8,7 +8,7 @@
 
 #include "Initialisation.h"
 
-WindowInit :: WindowInit () {
+Window :: Window () {
     windowProperties.h = 768;
     windowProperties.w = 1024;
     imageProperties.w = 1024;
@@ -17,7 +17,7 @@ WindowInit :: WindowInit () {
     Init();
 }
 
-WindowInit :: WindowInit (int width, int height) {
+Window :: Window (int width, int height) {
     windowProperties.h = height;
     windowProperties.w = width;
     imageProperties.w = width;
@@ -26,7 +26,7 @@ WindowInit :: WindowInit (int width, int height) {
     Init();
 }
 
-WindowInit :: ~WindowInit (){
+Window :: ~Window (){
     if (setCloseImage == 1) CloseImage();
     if  (setCloseTexture == 1) CloseTexture ();
 
@@ -38,7 +38,7 @@ WindowInit :: ~WindowInit (){
     SDL_Quit ();
 }
 
-void WindowInit :: Init () {
+void Window :: Init () {
     imageProperties.x = 0;
     imageProperties.y = 0;
 
@@ -61,13 +61,14 @@ void WindowInit :: Init () {
     }
 }
 
-void WindowInit :: ImageInit () {
+void Window :: ImageInit () {
     windowSurface = SDL_GetWindowSurface (window);
     setCloseImage = 1;
 }
 
-void WindowInit :: TextureInit () {
-    if (!SDL_SetHint (SDL_HINT_RENDER_SCALE_QUALITY,  "2")) {
+void Window :: TextureInit () {
+    ScaleQuality scaleQuality;
+    if (!SDL_SetHint (SDL_HINT_RENDER_SCALE_QUALITY,  scaleQuality.anisotropicFiltering)) {
             printf("Error setting rendering quality : %s", SDL_GetError ());
     }
     else {
@@ -82,7 +83,7 @@ void WindowInit :: TextureInit () {
     }
 }
 
-void WindowInit :: LoadImage (string path) {
+void Window :: LoadImage (string path) {
     ImageInit ();
 
     SDL_Surface *surface = NULL;
@@ -100,7 +101,7 @@ void WindowInit :: LoadImage (string path) {
     }
 }
 
-void WindowInit :: BlitImage () {
+void Window :: BlitImage () {
     SDL_BlitScaled (loadedSurface, NULL, windowSurface, &imageProperties);
     SDL_UpdateWindowSurface (window);
 }
@@ -108,7 +109,7 @@ void WindowInit :: BlitImage () {
 
 
 
-void WindowInit :: LoadTexture (string path) {
+void Window :: LoadTexture (string path) {
     TextureInit ();
     loadedSurface = IMG_Load (path.c_str());
     if (loadedSurface == NULL) {
@@ -123,13 +124,13 @@ void WindowInit :: LoadTexture (string path) {
     SDL_FreeSurface (loadedSurface);
 }
 
-void WindowInit :: RenderTexture () {
+void Window :: RenderTexture () {
     SDL_RenderClear (renderer);
     SDL_RenderCopy (renderer, texture, NULL, NULL);
     SDL_RenderPresent (renderer);
 }
 
-void WindowInit :: CloseImage () {
+void Window :: CloseImage () {
 
     SDL_FreeSurface(loadedSurface);
     loadedSurface = NULL;
@@ -138,7 +139,7 @@ void WindowInit :: CloseImage () {
     windowSurface = NULL;
 }
 
-void WindowInit :: CloseTexture () {
+void Window :: CloseTexture () {
 
     SDL_DestroyTexture (texture);
     texture = NULL;

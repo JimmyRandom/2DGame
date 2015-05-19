@@ -20,11 +20,11 @@
 using namespace std;
 
 
-class WindowInit {
+class Window {
     public:
-        WindowInit ();
-        WindowInit (int width, int height);
-        ~WindowInit ();
+        Window ();
+        Window (int width, int height);
+        ~Window ();
 
         void LoadImage (string path);
         void BlitImage ();
@@ -34,6 +34,7 @@ class WindowInit {
 
         SDL_Rect imageProperties;
         SDL_Rect windowProperties;
+
 
     protected:
 
@@ -57,6 +58,14 @@ class WindowInit {
 
         int setCloseImage;
         int setCloseTexture;
+
+        typedef struct ScaleQuality {
+                const char *pixelSampling = "0";
+                const char *linearFiltering = "1";
+                const char *anisotropicFiltering = "2";
+        };
+
+
 };
 
 
